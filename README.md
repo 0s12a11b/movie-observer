@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
 [![Testcontainers](https://img.shields.io/badge/Testcontainers-checked-blueviolet.svg)](https://testcontainers.com/)
 
-> Веб-сервис каталога фильмов с авторскими рецензиями, обзорами и гибким разграничением прав доступа, стилизованный под авторитетное издание **The Guardian** ("The Guardian | Кино").
+> Веб-сервис каталога фильмов с авторскими рецензиями, обзорами и гибким разграничением прав доступа.
 
 ---
 
