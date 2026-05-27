@@ -52,12 +52,23 @@ tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-Dfile.encoding=UTF-8")
     systemProperty("file.encoding", "UTF-8")
-    finalizedBy(tasks.jacocoTestReport)
+    // Не вызываем jacocoTestReport автоматически — он может упасть раньше тестов
 }
 
 tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    executionData(files(layout.buildDirectory.file("jacoco/manual-test.exec")))
+    // Поддерживаем оба варианта запуска тестов:
+    // 1) ./gradlew test     → build/jacoco/test.exec
+    // 2) ConsoleLauncher    → build/jacoco/manual-test.exec
+    executionData(
+        fileTree(layout.buildDirectory.dir("jacoco")) {
+            include("**/*.exec")
+        }
+    )
+    // Классы для анализа — только основные, не тестовые
+    classDirectories.setFrom(
+        fileTree(layout.buildDirectory.dir("classes/java/main"))
+    )
+    sourceDirectories.setFrom(files("src/main/java"))
     reports {
         xml.required.set(true)
         html.required.set(true)
