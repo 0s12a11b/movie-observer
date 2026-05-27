@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Редактирование статьи — The Movie Observer</title>
+</head>
+<body>
+<div layout:fragment="content" class="max-w-4xl mx-auto">
+
+    <!-- Back to Dashboard -->
+    <div class="mb-6">
+        <a href="/editor/dashboard" class="text-sm font-semibold text-gray-500 hover:text-[#005689] flex items-center gap-1">
+            ← Вернуться в панель редактора
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="border-b-2 border-gray-900 pb-4 mb-8">
+        <h1 class="text-3xl font-bold serif-title text-gray-900" th:text="${article.id == null ? 'Написать новую статью' : 'Редактировать статью'}">Написать статью</h1>
+        <p class="text-gray-500 mt-1 text-sm">Создание и редактирование аналитических колонок, обзоров и новостей в стиле The Guardian.</p>
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${errorMessage}" class="bg-red-50 border-l-4 border-red-600 p-4 mb-6 rounded-r-lg">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <span class="text-red-600 font-bold">⚠️</span>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700" th:text="${errorMessage}">Произошла ошибка.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Editor Form -->
+    <form th:action="@{/editor/articles/save}" method="post" class="space-y-6 bg-white border border-gray-200 p-6 md:p-8 rounded-xl shadow-sm">
+        
+        <input type="hidden" name="id" th:value="${article.id}" />
+
+        <!-- Title -->
+        <div>
+            <label for="title" class="block text-sm font-bold text-gray-900 mb-1">Заголовок статьи <span class="text-red-500">*</span></label>
+            <input type="text" id="title" name="title" th:value="${article.title}" required
+                   placeholder="Например: Почему 'Интерстеллар' остается лучшей фантастикой десятилетия"
+                   class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] text-base serif-title font-semibold" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Category -->
+            <div>
+                <label for="category" class="block text-sm font-bold text-gray-900 mb-1">Категория <span class="text-red-500">*</span></label>
+                <select id="category" name="category" required
+                        class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] bg-white text-sm">
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${cat == article.category}"></option>
+                </select>
+            </div>
+
+            <!-- Linked Movie -->
+            <div>
+                <label for="movieId" class="block text-sm font-bold text-gray-900 mb-1">Связанный фильм</label>
+                <select id="movieId" name="movieId"
+                        class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] bg-white text-sm">
+                    <option value="">— Не связан с фильмом —</option>
+                    <option th:each="movie : ${movies}" th:value="${movie.id}" th:text="${movie.title}" th:selected="${article.movie != null && movie.id == article.movie.id}"></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Banner URL -->
+        <div>
+            <label for="bannerUrl" class="block text-sm font-bold text-gray-900 mb-1">Ссылка на баннер статьи (изображение)</label>
+            <input type="text" id="bannerUrl" name="bannerUrl" th:value="${article.bannerUrl}"
+                   placeholder="Например: /images/interstellar.png или внешний URL изображения"
+                   class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] text-sm" />
+        </div>
+
+        <!-- Lead Paragraph -->
+        <div>
+            <label for="leadParagraph" class="block text-sm font-bold text-gray-900 mb-1">Лид-абзац (введение) <span class="text-red-500">*</span></label>
+            <textarea id="leadParagraph" name="leadParagraph" rows="3" required
+                      placeholder="Краткое интригующее введение, выделяемое жирным шрифтом на странице статьи..."
+                      class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] text-sm leading-relaxed"
+                      th:text="${article.leadParagraph}"></textarea>
+        </div>
+
+        <!-- Body Content -->
+        <div>
+            <label for="bodyContent" class="block text-sm font-bold text-gray-900 mb-1">Текст статьи <span class="text-red-500">*</span></label>
+            <textarea id="bodyContent" name="bodyContent" rows="12" required
+                      placeholder="Основное содержание статьи. Поддерживается разделение абзацев..."
+                      class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] text-sm leading-relaxed serif-title"
+                      th:text="${article.bodyContent}"></textarea>
+        </div>
+
+        <!-- Status -->
+        <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <label for="status" class="block text-sm font-bold text-gray-900 mb-1">Статус публикации <span class="text-red-500">*</span></label>
+                <p class="text-xs text-gray-500">Черновики видны только вам в панели редактора. Опубликованные статьи сразу попадают на главную страницу.</p>
+            </div>
+            <select id="status" name="status" required
+                    class="w-full sm:max-w-[200px] border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] bg-white text-sm font-semibold">
+                <option th:each="st : ${statuses}" th:value="${st}" th:text="${st == T(com.movieobserver.domain.entity.Article.ArticleStatus).DRAFT ? 'Черновик' : (st == T(com.movieobserver.domain.entity.Article.ArticleStatus).PUBLISHED ? 'Опубликовано' : st)}" th:selected="${st == article.status}"></option>
+            </select>
+        </div>
+
+        <!-- Submit & Cancel -->
+        <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
+            <a href="/editor/dashboard" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition rounded-lg">Отмена</a>
+            <button type="submit" class="bg-[#005689] hover:bg-[#00436a] text-white font-bold py-2 px-6 rounded-lg text-sm transition">
+                Сохранить статью
+            </button>
+        </div>
+
+    </form>
+
+</div>
+</body>
+</html>

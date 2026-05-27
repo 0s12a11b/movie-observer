@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1" author="system">
+        <!-- 1. users table -->
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- 2. roles table -->
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- 3. user_roles table -->
+        <createTable tableName="user_roles">
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="user_roles" columnNames="user_id, role_id" constraintName="pk_user_roles"/>
+
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_user_roles_user"/>
+
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="role_id"
+                                 referencedTableName="roles" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_user_roles_role"/>
+
+        <!-- 4. movies table -->
+        <createTable tableName="movies">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="release_year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_minutes" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="poster_url" type="VARCHAR(512)"/>
+            <column name="average_rating" type="NUMERIC(3,2)" defaultValueNumeric="0.00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- 5. genres table -->
+        <createTable tableName="genres">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+        </createTable>
+
+        <!-- 6. movie_genres table -->
+        <createTable tableName="movie_genres">
+            <column name="movie_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="genre_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="movie_genres" columnNames="movie_id, genre_id" constraintName="pk_movie_genres"/>
+
+        <addForeignKeyConstraint baseTableName="movie_genres" baseColumnNames="movie_id"
+                                 referencedTableName="movies" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_movie_genres_movie"/>
+
+        <addForeignKeyConstraint baseTableName="movie_genres" baseColumnNames="genre_id"
+                                 referencedTableName="genres" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_movie_genres_genre"/>
+
+        <!-- 7. persons table -->
+        <createTable tableName="persons">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="full_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bio" type="TEXT"/>
+            <column name="birth_date" type="DATE"/>
+            <column name="photo_url" type="VARCHAR(512)"/>
+        </createTable>
+
+        <!-- 8. movie_cast table -->
+        <createTable tableName="movie_cast">
+            <column name="movie_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="movie_cast" columnNames="movie_id, person_id, role_type" constraintName="pk_movie_cast"/>
+
+        <addForeignKeyConstraint baseTableName="movie_cast" baseColumnNames="movie_id"
+                                 referencedTableName="movies" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_movie_cast_movie"/>
+
+        <addForeignKeyConstraint baseTableName="movie_cast" baseColumnNames="person_id"
+                                 referencedTableName="persons" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_movie_cast_person"/>
+
+        <!-- 9. reviews table -->
+        <createTable tableName="reviews">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="movie_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="review_text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_approved" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="reviews" baseColumnNames="movie_id"
+                                 referencedTableName="movies" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_reviews_movie"/>
+
+        <addForeignKeyConstraint baseTableName="reviews" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 onDelete="CASCADE" constraintName="fk_reviews_user"/>
+
+        <sql>
+            ALTER TABLE reviews ADD CONSTRAINT check_rating CHECK (rating >= 1 AND rating &lt;= 10);
+        </sql>
+
+        <!-- 10. articles table -->
+        <createTable tableName="articles">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lead_paragraph" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body_content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="banner_url" type="VARCHAR(512)"/>
+            <column name="category" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="movie_id" type="UUID"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="articles" baseColumnNames="author_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 constraintName="fk_articles_author"/>
+
+        <addForeignKeyConstraint baseTableName="articles" baseColumnNames="movie_id"
+                                 referencedTableName="movies" referencedColumnNames="id"
+                                 onDelete="SET NULL" constraintName="fk_articles_movie"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${movie.title} + ' - The Guardian | Кино'">Детали фильма - The Guardian | Кино</title>
+</head>
+<body>
+    <main layout:fragment="content">
+        <!-- Back navigation link -->
+        <div class="mb-6">
+            <a href="/movies" class="text-sm font-semibold text-gray-500 hover:text-[#005689] flex items-center gap-1">
+                ← Назад в каталог
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Side: Poster and Metadata -->
+            <div class="lg:col-span-1">
+                <div class="bg-white border border-gray-200 p-4 sticky top-6">
+                    <div class="h-96 bg-gray-100 overflow-hidden mb-4 relative">
+                        <img th:if="${movie.posterUrl != null && !movie.posterUrl.empty}" th:src="${movie.posterUrl}" class="w-full h-full object-cover" alt="Poster">
+                        <div th:unless="${movie.posterUrl != null && !movie.posterUrl.empty}" class="w-full h-full flex items-center justify-center text-gray-450">Нет фото</div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                            <span class="text-sm text-gray-500">Год выпуска:</span>
+                            <span class="text-sm font-bold text-gray-900" th:text="${movie.releaseYear}">2024</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                            <span class="text-sm text-gray-500">Продолжительность:</span>
+                            <span class="text-sm font-bold text-gray-900" th:text="${movie.durationMinutes} + ' мин'">120 мин</span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-100 pb-2">
+                            <span class="text-sm text-gray-500">Средняя оценка:</span>
+                            <div class="flex items-center gap-1 font-bold text-[#005689]">
+                                <span>★</span>
+                                <span th:text="${movie.averageRating}">8.5</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500 block mb-1">Жанры:</span>
+                            <div class="flex flex-wrap gap-1">
+                                <span th:each="g : ${movie.genres}" th:text="${g.name}" class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded">
+                                    Жанр
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Details, Cast & Reviews -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Movie Header & Description -->
+                <div class="bg-white border border-gray-200 p-6 md:p-8">
+                    <h1 class="text-3xl md:text-4xl serif-title font-bold text-gray-900 mb-4" th:text="${movie.title}">Название фильма</h1>
+                    <h2 class="text-lg font-bold text-gray-750 mb-3 border-b border-gray-100 pb-2">Описание</h2>
+                    <p class="text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line" th:text="${movie.description}">Описание фильма...</p>
+                </div>
+
+                <!-- Cast list (Directors & Actors grouped) -->
+                <div class="bg-white border border-gray-200 p-6 md:p-8">
+                    <h2 class="text-xl font-bold serif-title text-gray-900 mb-4 border-b border-gray-200 pb-2">Съемочная группа</h2>
+                    
+                    <!-- Directors Section -->
+                    <div class="mb-6" th:if="${!#lists.isEmpty(directors)}">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Режиссеры</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <div th:each="castMember : ${directors}" class="bg-gray-50 border border-gray-200 px-3 py-1.5 flex items-center gap-2">
+                                <span class="font-bold text-gray-800 text-sm" th:text="${castMember.person.fullName}">Режиссер</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actors Section -->
+                    <div th:if="${!#lists.isEmpty(actors)}">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Актеры</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div th:each="castMember : ${actors}" class="bg-gray-50 border border-gray-200 p-3 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-250 overflow-hidden flex-shrink-0">
+                                    <img th:if="${castMember.person.photoUrl != null && !castMember.person.photoUrl.empty}" th:src="${castMember.person.photoUrl}" class="w-full h-full object-cover" alt="Photo">
+                                    <div th:unless="${castMember.person.photoUrl != null && !castMember.person.photoUrl.empty}" class="w-full h-full flex items-center justify-center text-gray-400 text-[10px]">Фото</div>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800 text-sm" th:text="${castMember.person.fullName}">Актер</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(directors) && #lists.isEmpty(actors)}" class="text-gray-500 text-sm">
+                        Информация о составе съемочной группы отсутствует.
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="bg-white border border-gray-200 p-6 md:p-8">
+                    <h2 class="text-xl font-bold serif-title text-gray-900 mb-6 border-b border-gray-200 pb-2">Рецензии и отзывы</h2>
+
+                    <div th:if="${#lists.isEmpty(reviews)}" class="text-gray-550 text-center py-6">
+                        Пока никто не оставил отзыв об этом фильме. Будьте первыми!
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(reviews)}" class="space-y-6">
+                        <div th:each="review : ${reviews}" class="border-b border-gray-100 pb-6 last:border-b-0 last:pb-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-gray-900" th:text="${review.user.displayName}">Имя пользователя</span>
+                                <div class="flex items-center gap-1 bg-yellow-500 text-white font-bold px-2 py-0.5 text-xs rounded">
+                                    <span>★</span>
+                                    <span th:text="${review.rating} + ' / 10'">8 / 10</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-line" th:text="${review.reviewText}">Текст рецензии...</p>
+                            <div class="text-[10px] text-gray-400 mt-2" th:text="${#temporals.format(review.createdAt, 'dd MMMM yyyy в HH:mm', new java.util.Locale('ru'))}">Дата публикации</div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Form -->
+                    <div class="mt-8 border-t border-gray-200 pt-6">
+                        <div th:if="${successMessage}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+                            <span th:text="${successMessage}"></span>
+                        </div>
+                        <div th:if="${errorMessage}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <!-- If authenticated -->
+                        <div th:if="${#authentication != null and #authentication.principal instanceof T(com.movieobserver.security.CustomUserDetails)}">
+                            <h3 class="text-lg font-bold serif-title text-gray-900 mb-4">Оставить отзыв</h3>
+                            <form th:action="@{/movies/{id}/reviews(id=${movie.id})}" method="POST" class="space-y-4">
+                                <div>
+                                    <label for="rating" class="block text-sm font-semibold text-gray-700 mb-1">Ваша оценка (1-10)</label>
+                                    <select id="rating" name="rating" required class="w-full max-w-[200px] border border-gray-300 rounded p-2 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] bg-white text-sm">
+                                        <option value="" disabled selected>Выберите оценку</option>
+                                        <option th:each="r : ${#numbers.sequence(1, 10)}" th:value="${r}" th:text="${r}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="reviewText" class="block text-sm font-semibold text-gray-700 mb-1">Текст рецензии</label>
+                                    <textarea id="reviewText" name="reviewText" rows="4" required minlength="10" placeholder="Поделитесь вашим мнением о фильме (минимум 10 символов)..." class="w-full border border-gray-300 rounded p-2.5 focus:outline-none focus:ring-1 focus:ring-[#005689] focus:border-[#005689] text-sm"></textarea>
+                                </div>
+                                <button type="submit" class="bg-[#005689] hover:bg-[#00436a] text-white font-bold py-2 px-4 rounded text-sm transition">
+                                    Отправить отзыв
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- If anonymous -->
+                        <div th:unless="${#authentication != null and #authentication.principal instanceof T(com.movieobserver.security.CustomUserDetails)}">
+                            <div class="bg-gray-50 border border-gray-200 p-4 rounded text-center text-sm">
+                                <span><a href="/login" class="text-[#005689] font-bold hover:underline">Войдите в аккаунт</a>, чтобы оставить отзыв</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

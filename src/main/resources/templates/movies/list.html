@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Каталог фильмов - The Guardian | Кино</title>
+</head>
+<body>
+    <main layout:fragment="content">
+        <!-- Search bar at the top -->
+        <div class="bg-white border border-gray-200 p-6 mb-8">
+            <form method="get" action="/movies" class="flex flex-col md:flex-row gap-4 items-center">
+                <input type="hidden" name="genreId" th:value="${selectedGenreId}" />
+                <div class="relative w-full flex-grow">
+                    <input type="text" name="title" th:value="${searchTitle}" placeholder="Поиск фильма по названию..." 
+                           class="w-full pl-4 pr-10 py-3 border border-gray-300 focus:outline-none focus:border-[#005689] focus:ring-1 focus:ring-[#005689] text-sm" />
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button type="submit" class="bg-[#005689] text-white px-6 py-3 font-semibold text-sm hover:bg-blue-800 transition w-full md:w-auto">
+                        Найти
+                    </button>
+                    <a href="/movies" class="bg-gray-100 text-gray-700 px-6 py-3 font-semibold text-sm hover:bg-gray-200 transition text-center w-full md:w-auto">
+                        Сбросить
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Genre Sidebar Filter (1/4 width) -->
+            <div class="lg:col-span-1 space-y-4">
+                <h3 class="text-lg font-bold serif-title border-b border-gray-200 pb-2">Жанры</h3>
+                <div class="flex flex-wrap lg:flex-col gap-2">
+                    <a th:href="@{/movies(title=${searchTitle})}" 
+                       th:class="${selectedGenreId == null} ? 'bg-[#005689] text-white px-3 py-2 text-xs font-semibold' : 'bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 px-3 py-2 text-xs font-semibold transition'">
+                        Все жанры
+                    </a>
+                    <a th:each="genre : ${genres}" 
+                       th:href="@{/movies(title=${searchTitle}, genreId=${genre.id})}" 
+                       th:class="${selectedGenreId == genre.id} ? 'bg-[#005689] text-white px-3 py-2 text-xs font-semibold' : 'bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 px-3 py-2 text-xs font-semibold transition'"
+                       th:text="${genre.name}">
+                        Жанр
+                    </a>
+                </div>
+            </div>
+
+            <!-- Movies List Grid (3/4 width) -->
+            <div class="lg:col-span-3">
+                <h2 class="text-2xl font-bold serif-title border-b border-gray-200 pb-2 mb-6">Результаты поиска</h2>
+
+                <div th:if="${#lists.isEmpty(movies)}" class="bg-white p-12 text-center border border-gray-200">
+                    <p class="text-gray-500">Фильмы, соответствующие критериям поиска, не найдены.</p>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(movies)}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <div th:each="movie : ${movies}" class="bg-white border border-gray-200 hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="h-64 bg-gray-100 overflow-hidden relative">
+                                <img th:if="${movie.posterUrl != null && !movie.posterUrl.empty}" th:src="${movie.posterUrl}" class="w-full h-full object-cover" alt="Poster">
+                                <div th:unless="${movie.posterUrl != null && !movie.posterUrl.empty}" class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Нет фото</div>
+                                <div class="absolute top-2 right-2 bg-yellow-500 text-white font-bold px-2 py-1 text-xs rounded flex items-center gap-1 shadow-sm">
+                                    <span>★</span> <span th:text="${movie.averageRating}">8.5</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-base text-gray-900 line-clamp-1 hover:text-[#005689] transition">
+                                    <a th:href="@{/movies/{id}(id=${movie.id})}" th:text="${movie.title}">Название фильма</a>
+                                </h3>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <span th:text="${movie.releaseYear}">2024</span> год • <span th:text="${movie.durationMinutes} + ' мин'">120 мин</span>
+                                </p>
+                                <div class="flex flex-wrap gap-1 mt-3">
+                                    <span th:each="g : ${movie.genres}" th:text="${g.name}" class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded">
+                                        Жанр
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <a th:href="@{/movies/{id}(id=${movie.id})}" class="block text-center bg-gray-50 hover:bg-[#005689] hover:text-white border border-gray-200 hover:border-[#005689] text-gray-700 text-xs font-semibold py-2 transition">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

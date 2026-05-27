@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${movie.id != null ? 'Редактировать фильм' : 'Новый фильм'} + ' — The Movie Observer'">
+        Фильм — The Movie Observer
+    </title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="max-w-3xl mx-auto">
+
+        <!-- Page Title -->
+        <div class="mb-6">
+            <a href="/editor/dashboard" class="text-sm text-[#005689] hover:underline">← Назад к панели редактора</a>
+            <h1 class="text-2xl font-bold text-gray-900 mt-2" style="font-family:'Georgia',serif;"
+                th:text="${movie.id != null ? 'Редактировать фильм' : 'Добавить фильм'}">Фильм</h1>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <form th:action="@{/editor/movies/save}" method="post" novalidate id="movieForm">
+                <!-- Hidden ID for edit -->
+                <input type="hidden" name="id" th:if="${movie.id != null}" th:value="${movie.id}">
+
+                <!-- Название -->
+                <div class="mb-5">
+                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-1">Название <span class="text-red-500">*</span></label>
+                    <input type="text" id="title" name="title" required
+                           th:value="${movie.title}"
+                           placeholder="Введите название фильма"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                    <p class="text-red-500 text-xs mt-1 hidden" id="titleError">Название обязательно для заполнения.</p>
+                </div>
+
+                <!-- Описание -->
+                <div class="mb-5">
+                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-1">Описание <span class="text-red-500">*</span></label>
+                    <textarea id="description" name="description" required rows="4"
+                              placeholder="Краткое описание сюжета"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent resize-none"
+                              th:text="${movie.description}"></textarea>
+                    <p class="text-red-500 text-xs mt-1 hidden" id="descError">Описание обязательно для заполнения.</p>
+                </div>
+
+                <!-- Год / Продолжительность -->
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                        <label for="releaseYear" class="block text-sm font-semibold text-gray-700 mb-1">Год выпуска <span class="text-red-500">*</span></label>
+                        <input type="number" id="releaseYear" name="releaseYear" required
+                               min="1900" max="2030"
+                               th:value="${movie.releaseYear}"
+                               placeholder="2024"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                        <p class="text-red-500 text-xs mt-1 hidden" id="yearError">Год должен быть от 1900 до 2030.</p>
+                    </div>
+                    <div>
+                        <label for="durationMinutes" class="block text-sm font-semibold text-gray-700 mb-1">Продолжительность (мин) <span class="text-red-500">*</span></label>
+                        <input type="number" id="durationMinutes" name="durationMinutes" required
+                               min="1"
+                               th:value="${movie.durationMinutes}"
+                               placeholder="120"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                        <p class="text-red-500 text-xs mt-1 hidden" id="durError">Продолжительность должна быть больше 0.</p>
+                    </div>
+                </div>
+
+                <!-- URL постера -->
+                <div class="mb-6">
+                    <label for="posterUrl" class="block text-sm font-semibold text-gray-700 mb-1">URL постера</label>
+                    <input type="url" id="posterUrl" name="posterUrl"
+                           th:value="${movie.posterUrl}"
+                           placeholder="https://example.com/poster.jpg"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                </div>
+
+                <!-- Жанры -->
+                <div class="mb-6">
+                    <p class="block text-sm font-semibold text-gray-700 mb-2">Жанры</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                        <label th:each="genre : ${allGenres}" class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="genreIds"
+                                   th:value="${genre.id}"
+                                   th:checked="${selectedGenreIds != null and #lists.contains(selectedGenreIds, genre.id)}"
+                                   class="rounded border-gray-300 text-[#005689] focus:ring-[#005689]">
+                            <span class="text-sm text-gray-700" th:text="${genre.name}"></span>
+                        </label>
+                        <p th:if="${#lists.isEmpty(allGenres)}" class="text-sm text-gray-400 col-span-3">Жанры не найдены</p>
+                    </div>
+                </div>
+
+                <!-- Режиссёры -->
+                <div class="mb-6">
+                    <p class="block text-sm font-semibold text-gray-700 mb-2">Режиссёры</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                        <label th:each="person : ${allPersons}" class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="directorIds"
+                                   th:value="${person.id}"
+                                   th:checked="${selectedDirectorIds != null and #lists.contains(selectedDirectorIds, person.id)}"
+                                   class="rounded border-gray-300 text-[#005689] focus:ring-[#005689]">
+                            <span class="text-sm text-gray-700" th:text="${person.fullName}"></span>
+                        </label>
+                        <p th:if="${#lists.isEmpty(allPersons)}" class="text-sm text-gray-400 col-span-3">Персоны не найдены</p>
+                    </div>
+                </div>
+
+                <!-- Актёры -->
+                <div class="mb-8">
+                    <p class="block text-sm font-semibold text-gray-700 mb-2">Актёры</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                        <label th:each="person : ${allPersons}" class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="actorIds"
+                                   th:value="${person.id}"
+                                   th:checked="${selectedActorIds != null and #lists.contains(selectedActorIds, person.id)}"
+                                   class="rounded border-gray-300 text-[#005689] focus:ring-[#005689]">
+                            <span class="text-sm text-gray-700" th:text="${person.fullName}"></span>
+                        </label>
+                        <p th:if="${#lists.isEmpty(allPersons)}" class="text-sm text-gray-400 col-span-3">Персоны не найдены</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button type="submit"
+                            class="bg-[#005689] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#00436a] transition">
+                        Сохранить
+                    </button>
+                    <a href="/editor/dashboard"
+                       class="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('movieForm').addEventListener('submit', function(e) {
+            let valid = true;
+
+            const title = document.getElementById('title');
+            const titleError = document.getElementById('titleError');
+            if (!title.value.trim()) {
+                titleError.classList.remove('hidden');
+                valid = false;
+            } else {
+                titleError.classList.add('hidden');
+            }
+
+            const desc = document.getElementById('description');
+            const descError = document.getElementById('descError');
+            if (!desc.value.trim()) {
+                descError.classList.remove('hidden');
+                valid = false;
+            } else {
+                descError.classList.add('hidden');
+            }
+
+            const year = parseInt(document.getElementById('releaseYear').value);
+            const yearError = document.getElementById('yearError');
+            if (isNaN(year) || year < 1900 || year > 2030) {
+                yearError.classList.remove('hidden');
+                valid = false;
+            } else {
+                yearError.classList.add('hidden');
+            }
+
+            const dur = parseInt(document.getElementById('durationMinutes').value);
+            const durError = document.getElementById('durError');
+            if (isNaN(dur) || dur <= 0) {
+                durError.classList.remove('hidden');
+                valid = false;
+            } else {
+                durError.classList.add('hidden');
+            }
+
+            if (!valid) e.preventDefault();
+        });
+    </script>
+
+</div>
+</body>
+</html>

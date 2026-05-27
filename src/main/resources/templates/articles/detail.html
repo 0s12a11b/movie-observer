@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title th:text="${article.title} + ' - The Guardian | Кино'">Статья - The Guardian | Кино</title>
+</head>
+<body>
+    <main layout:fragment="content">
+        <!-- Back navigation link -->
+        <div class="mb-6">
+            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-[#005689] flex items-center gap-1">
+                ← Назад на главную
+            </a>
+        </div>
+
+        <article class="max-w-4xl mx-auto bg-white border border-gray-200 overflow-hidden">
+            <!-- Banner image -->
+            <div th:if="${article.bannerUrl != null && !article.bannerUrl.empty}" class="w-full h-[350px] overflow-hidden">
+                <img th:src="${article.bannerUrl}" class="w-full h-full object-cover" alt="Article banner">
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-6 md:p-12">
+                <!-- Metadata -->
+                <div class="flex items-center gap-3 text-xs font-semibold text-red-600 uppercase tracking-wider mb-4">
+                    <span th:text="${article.category}">CATEGORY</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-500 font-normal">Автор: <span class="font-semibold text-gray-700" th:text="${article.author.displayName}">Имя</span></span>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-500 font-normal" th:text="${#temporals.format(article.createdAt, 'dd MMMM yyyy в HH:mm', new java.util.Locale('ru'))}">Дата</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-3xl md:text-5xl serif-title font-bold text-gray-900 leading-tight mb-6" th:text="${article.title}">Заголовок статьи</h1>
+
+                <!-- Lead Paragraph -->
+                <div class="border-l-4 border-[#005689] pl-4 md:pl-6 my-6">
+                    <p class="serif-title text-lg md:text-xl text-gray-700 font-medium italic leading-relaxed" th:text="${article.leadParagraph}">Лид-абзац...</p>
+                </div>
+
+                <!-- Related Movie Link -->
+                <div th:if="${article.movie != null}" class="bg-blue-50 border border-blue-100 p-4 mb-8 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs text-[#005689] font-bold uppercase tracking-wider">Связанный фильм</span>
+                        <h4 class="font-bold text-gray-900 text-sm md:text-base" th:text="${article.movie.title}">Название фильма</h4>
+                    </div>
+                    <a th:href="@{/movies/{id}(id=${article.movie.id})}" class="bg-[#005689] text-white hover:bg-blue-800 text-xs font-bold px-4 py-2 transition">
+                        Смотреть фильм
+                    </a>
+                </div>
+
+                <!-- Body Content -->
+                <div class="text-gray-805 text-slate-800 text-base md:text-lg leading-relaxed whitespace-pre-line" th:text="${article.bodyContent}">
+                    Основное тело статьи...
+                </div>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

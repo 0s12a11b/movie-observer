@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Добавить персону — The Movie Observer</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="max-w-2xl mx-auto">
+
+        <div class="mb-6">
+            <a href="/editor/dashboard" class="text-sm text-[#005689] hover:underline">← Назад к панели редактора</a>
+            <h1 class="text-2xl font-bold text-gray-900 mt-2" style="font-family:'Georgia',serif;">Добавить персону</h1>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <form action="/editor/persons/save" method="post" novalidate id="personForm">
+
+                <!-- ФИО -->
+                <div class="mb-5">
+                    <label for="fullName" class="block text-sm font-semibold text-gray-700 mb-1">
+                        ФИО <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="fullName" name="fullName" required
+                           placeholder="Иванов Иван Иванович"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                    <p class="text-red-500 text-xs mt-1 hidden" id="nameError">ФИО обязательно для заполнения.</p>
+                </div>
+
+                <!-- Биография -->
+                <div class="mb-5">
+                    <label for="bio" class="block text-sm font-semibold text-gray-700 mb-1">Биография</label>
+                    <textarea id="bio" name="bio" rows="5"
+                              placeholder="Краткая биография персоны..."
+                              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent resize-none"></textarea>
+                </div>
+
+                <!-- Дата рождения -->
+                <div class="mb-5">
+                    <label for="birthDate" class="block text-sm font-semibold text-gray-700 mb-1">Дата рождения</label>
+                    <input type="date" id="birthDate" name="birthDate"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                </div>
+
+                <!-- URL фото -->
+                <div class="mb-8">
+                    <label for="photoUrl" class="block text-sm font-semibold text-gray-700 mb-1">URL фото</label>
+                    <input type="url" id="photoUrl" name="photoUrl"
+                           placeholder="https://example.com/photo.jpg"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#005689] focus:border-transparent">
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button type="submit"
+                            class="bg-[#005689] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#00436a] transition">
+                        Сохранить
+                    </button>
+                    <a href="/editor/dashboard"
+                       class="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('personForm').addEventListener('submit', function(e) {
+            const fullName = document.getElementById('fullName');
+            const nameError = document.getElementById('nameError');
+            if (!fullName.value.trim()) {
+                nameError.classList.remove('hidden');
+                e.preventDefault();
+            } else {
+                nameError.classList.add('hidden');
+            }
+        });
+    </script>
+
+</div>
+</body>
+</html>

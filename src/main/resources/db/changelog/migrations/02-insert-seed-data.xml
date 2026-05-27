@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2" author="system">
+        <validCheckSum>ANY</validCheckSum>
+        <!-- 1. Roles -->
+        <insert tableName="roles">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="ROLE_USER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="ROLE_CRITIC"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="ROLE_EDITOR"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="ROLE_ADMIN"/>
+        </insert>
+
+        <!-- 2. Users (BCrypt hash for "123" is $2a$10$NFnSfF4ZwtOl6dGNxXKXuedV27eR2xGTeg2Q4VSblo3EzdMRtz/6i) -->
+        <insert tableName="users">
+            <column name="id" valueComputed="CAST('4bc5d0c7-d1a1-4328-86d7-cd188849b291' AS UUID)"/>
+            <column name="email" value="user@movieobserver.ru"/>
+            <column name="password_hash" value="$2a$10$NFnSfF4ZwtOl6dGNxXKXuedV27eR2xGTeg2Q4VSblo3EzdMRtz/6i"/>
+            <column name="display_name" value="Алексей"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" valueComputed="CAST('5bc5d0c7-d1a1-4328-86d7-cd188849b292' AS UUID)"/>
+            <column name="email" value="critic@movieobserver.ru"/>
+            <column name="password_hash" value="$2a$10$NFnSfF4ZwtOl6dGNxXKXuedV27eR2xGTeg2Q4VSblo3EzdMRtz/6i"/>
+            <column name="display_name" value="Мария"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" valueComputed="CAST('6bc5d0c7-d1a1-4328-86d7-cd188849b293' AS UUID)"/>
+            <column name="email" value="editor@movieobserver.ru"/>
+            <column name="password_hash" value="$2a$10$NFnSfF4ZwtOl6dGNxXKXuedV27eR2xGTeg2Q4VSblo3EzdMRtz/6i"/>
+            <column name="display_name" value="Елена"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" valueComputed="CAST('7bc5d0c7-d1a1-4328-86d7-cd188849b294' AS UUID)"/>
+            <column name="email" value="admin@movieobserver.ru"/>
+            <column name="password_hash" value="$2a$10$NFnSfF4ZwtOl6dGNxXKXuedV27eR2xGTeg2Q4VSblo3EzdMRtz/6i"/>
+            <column name="display_name" value="Иван"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+
+        <!-- 3. User Roles mapping -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueComputed="CAST('4bc5d0c7-d1a1-4328-86d7-cd188849b291' AS UUID)"/>
+            <column name="role_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueComputed="CAST('5bc5d0c7-d1a1-4328-86d7-cd188849b292' AS UUID)"/>
+            <column name="role_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueComputed="CAST('6bc5d0c7-d1a1-4328-86d7-cd188849b293' AS UUID)"/>
+            <column name="role_id" valueNumeric="3"/>
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueComputed="CAST('7bc5d0c7-d1a1-4328-86d7-cd188849b294' AS UUID)"/>
+            <column name="role_id" valueNumeric="4"/>
+        </insert>
+
+        <!-- 4. Genres -->
+        <insert tableName="genres">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Драма"/>
+            <column name="description" value="Жанр литературы и драматургии, получивший особое распространение в литературе XIX-XXI веков."/>
+        </insert>
+        <insert tableName="genres">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Фантастика"/>
+            <column name="description" value="Жанр и творческий метод в художественном творчестве, характеризующийся использованием фантастического допущения."/>
+        </insert>
+        <insert tableName="genres">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Триллер"/>
+            <column name="description" value="Жанр произведений повествовательного искусства, нацеленный вызвать у зрителя чувства тревожного ожидания и страха."/>
+        </insert>
+        <insert tableName="genres">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Комедия"/>
+            <column name="description" value="Жанр художественного произведения, характеризующийся юмористическим или сатирическим подходами."/>
+        </insert>
+        <insert tableName="genres">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="Боевик"/>
+            <column name="description" value="Жанр кинематографа, в котором основное внимание уделяется насилию, погоням и перестрелкам."/>
+        </insert>
+
+        <!-- 5. Movies -->
+        <insert tableName="movies">
+            <column name="id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="title" value="Интерстеллар"/>
+            <column name="description" value="Группа исследователей отправляется в путешествие через червоточину, чтобы спасти человечество."/>
+            <column name="release_year" valueNumeric="2014"/>
+            <column name="duration_minutes" valueNumeric="169"/>
+            <column name="average_rating" valueNumeric="9.00"/>
+            <column name="poster_url" value="/images/interstellar.png"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="movies">
+            <column name="id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="title" value="Начало"/>
+            <column name="description" value="Профессиональный вор крадет секреты из глубин подсознания во время сна."/>
+            <column name="release_year" valueNumeric="2010"/>
+            <column name="duration_minutes" valueNumeric="148"/>
+            <column name="average_rating" valueNumeric="9.80"/>
+            <column name="poster_url" value="/images/inception.png"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="movies">
+            <column name="id" valueComputed="CAST('33333333-3333-3333-3333-333333333333' AS UUID)"/>
+            <column name="title" value="Иван Васильевич меняет профессию"/>
+            <column name="description" value="Советская комедия о перемещении во времени и смене ролей царя и управдома."/>
+            <column name="release_year" valueNumeric="1973"/>
+            <column name="duration_minutes" valueNumeric="88"/>
+            <column name="average_rating" valueNumeric="0.00"/>
+            <column name="poster_url" value="/images/ivan_vasilievich.png"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="movies">
+            <column name="id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="title" value="Брат"/>
+            <column name="description" value="Культовый российский фильм о Даниле Багрове, вернувшемся из армии в бурные 90-е."/>
+            <column name="release_year" valueNumeric="1997"/>
+            <column name="duration_minutes" valueNumeric="100"/>
+            <column name="average_rating" valueNumeric="8.00"/>
+            <column name="poster_url" value="/images/brat.png"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="movies">
+            <column name="id" valueComputed="CAST('55555555-5555-5555-5555-555555555555' AS UUID)"/>
+            <column name="title" value="Престиж"/>
+            <column name="description" value="История соперничества двух иллюзионистов в Лондоне на рубеже XIX и XX веков."/>
+            <column name="release_year" valueNumeric="2006"/>
+            <column name="duration_minutes" valueNumeric="130"/>
+            <column name="average_rating" valueNumeric="0.00"/>
+            <column name="poster_url" value="/images/prestige.png"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+
+        <!-- 6. Movie Genres mapping -->
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="genre_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="genre_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="genre_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="genre_id" valueNumeric="3"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('33333333-3333-3333-3333-333333333333' AS UUID)"/>
+            <column name="genre_id" valueNumeric="4"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="genre_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="genre_id" valueNumeric="5"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('55555555-5555-5555-5555-555555555555' AS UUID)"/>
+            <column name="genre_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="movie_genres">
+            <column name="movie_id" valueComputed="CAST('55555555-5555-5555-5555-555555555555' AS UUID)"/>
+            <column name="genre_id" valueNumeric="3"/>
+        </insert>
+
+        <!-- 7. Persons -->
+        <insert tableName="persons">
+            <column name="id" valueComputed="CAST('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' AS UUID)"/>
+            <column name="full_name" value="Кристофер Нолан"/>
+            <column name="bio" value="Британский и американский кинорежиссер, сценарист и продюсер."/>
+            <column name="birth_date" value="1970-07-30"/>
+        </insert>
+        <insert tableName="persons">
+            <column name="id" valueComputed="CAST('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' AS UUID)"/>
+            <column name="full_name" value="Леонардо Ди Каприо"/>
+            <column name="bio" value="Американский актер и продюсер, лауреат премии «Оскар»."/>
+            <column name="birth_date" value="1974-11-11"/>
+        </insert>
+        <insert tableName="persons">
+            <column name="id" valueComputed="CAST('cccccccc-cccc-cccc-cccc-cccccccccccc' AS UUID)"/>
+            <column name="full_name" value="Алексей Балабанов"/>
+            <column name="bio" value="Советский и российский кинорежиссер, сценарист и продюсер."/>
+            <column name="birth_date" value="1959-02-25"/>
+        </insert>
+        <insert tableName="persons">
+            <column name="id" valueComputed="CAST('dddddddd-dddd-dddd-dddd-dddddddddddd' AS UUID)"/>
+            <column name="full_name" value="Сергей Бодров-младший"/>
+            <column name="bio" value="Советский и российский актер, кинорежиссер, сценарист."/>
+            <column name="birth_date" value="1971-12-27"/>
+        </insert>
+
+        <!-- 8. Movie Cast mapping -->
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' AS UUID)"/>
+            <column name="role_type" value="DIRECTOR"/>
+        </insert>
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' AS UUID)"/>
+            <column name="role_type" value="DIRECTOR"/>
+        </insert>
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' AS UUID)"/>
+            <column name="role_type" value="ACTOR"/>
+        </insert>
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('cccccccc-cccc-cccc-cccc-cccccccccccc' AS UUID)"/>
+            <column name="role_type" value="DIRECTOR"/>
+        </insert>
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('dddddddd-dddd-dddd-dddd-dddddddddddd' AS UUID)"/>
+            <column name="role_type" value="ACTOR"/>
+        </insert>
+        <insert tableName="movie_cast">
+            <column name="movie_id" valueComputed="CAST('55555555-5555-5555-5555-555555555555' AS UUID)"/>
+            <column name="person_id" valueComputed="CAST('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' AS UUID)"/>
+            <column name="role_type" value="DIRECTOR"/>
+        </insert>
+
+        <!-- 9. Reviews -->
+        <insert tableName="reviews">
+            <column name="id" valueComputed="CAST('e1e1e1e1-e1e1-e1e1-e1e1-e1e1e1e1e1e1' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="user_id" valueComputed="CAST('4bc5d0c7-d1a1-4328-86d7-cd188849b291' AS UUID)"/>
+            <column name="rating" valueNumeric="9"/>
+            <column name="review_text" value="Потрясающий фильм! Музыка Ханса Циммера берет за душу."/>
+            <column name="is_approved" valueBoolean="true"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="reviews">
+            <column name="id" valueComputed="CAST('e2e2e2e2-e2e2-e2e2-e2e2-e2e2e2e2e2e2' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="user_id" valueComputed="CAST('5bc5d0c7-d1a1-4328-86d7-cd188849b292' AS UUID)"/>
+            <column name="rating" valueNumeric="10"/>
+            <column name="review_text" value="Шедевр кинематографа. Нолан превзошел сам себя."/>
+            <column name="is_approved" valueBoolean="true"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="reviews">
+            <column name="id" valueComputed="CAST('e3e3e3e3-e3e3-e3e3-e3e3-e3e3e3e3e3e3' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="user_id" valueComputed="CAST('4bc5d0c7-d1a1-4328-86d7-cd188849b291' AS UUID)"/>
+            <column name="rating" valueNumeric="8"/>
+            <column name="review_text" value="Отличный фильм про эпоху 90-х."/>
+            <column name="is_approved" valueBoolean="true"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+
+        <!-- 10. Articles -->
+        <insert tableName="articles">
+            <column name="id" valueComputed="CAST('f1f1f1f1-f1f1-f1f1-f1f1-f1f1f1f1f1f1' AS UUID)"/>
+            <column name="title" value="Феномен Интерстеллара: наука и драма"/>
+            <column name="lead_paragraph" value="Как Кристофер Нолан объединил научную фантастику и глубокие семейные ценности в одном фильме."/>
+            <column name="body_content" value="Фильм 'Интерстеллар' до сих пор обсуждается учеными и киноманами. Нолан смог показать сингулярность черной дыры..."/>
+            <column name="category" value="REVIEW"/>
+            <column name="status" value="PUBLISHED"/>
+            <column name="author_id" valueComputed="CAST('5bc5d0c7-d1a1-4328-86d7-cd188849b292' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('11111111-1111-1111-1111-111111111111' AS UUID)"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="articles">
+            <column name="id" valueComputed="CAST('f2f2f2f2-f2f2-f2f2-f2f2-f2f2f2f2f2f2' AS UUID)"/>
+            <column name="title" value="Почему Начало — лучший интеллектуальный блокбастер десятилетия"/>
+            <column name="lead_paragraph" value="Разбор концепции снов внутри снов и того, как этот концепт реализован на экране."/>
+            <column name="body_content" value="Фильм удерживает зрителя в постоянном напряжении, заставляя сомневаться в реальности происходящего..."/>
+            <column name="category" value="ANALYSIS"/>
+            <column name="status" value="PUBLISHED"/>
+            <column name="author_id" valueComputed="CAST('6bc5d0c7-d1a1-4328-86d7-cd188849b293' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('22222222-2222-2222-2222-222222222222' AS UUID)"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+        <insert tableName="articles">
+            <column name="id" valueComputed="CAST('f3f3f3f3-f3f3-f3f3-f3f3-f3f3f3f3f3f3' AS UUID)"/>
+            <column name="title" value="Наследие Алексея Балабанова"/>
+            <column name="lead_paragraph" value="Какое влияние фильм Брат оказал на современное российское кино."/>
+            <column name="body_content" value="Данила Багров стал национальным героем, а сам фильм отразил дух целой эпохи..."/>
+            <column name="category" value="RETROSPECTIVE"/>
+            <column name="status" value="PUBLISHED"/>
+            <column name="author_id" valueComputed="CAST('5bc5d0c7-d1a1-4328-86d7-cd188849b292' AS UUID)"/>
+            <column name="movie_id" valueComputed="CAST('44444444-4444-4444-4444-444444444444' AS UUID)"/>
+            <column name="created_at" value="2026-05-26 20:00:00+03"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

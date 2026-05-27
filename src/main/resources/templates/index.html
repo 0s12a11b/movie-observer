@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Главная - The Movie Observer | Кино</title>
+</head>
+<body>
+    <main layout:fragment="content">
+        <!-- Main Section: Asymmetric grid 2/3 and 1/3 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Side: Articles List (2/3 width) -->
+            <div class="lg:col-span-2 space-y-8">
+                <h2 class="text-2xl font-bold serif-title border-b-2 border-red-600 pb-2 mb-6">Свежие публикации</h2>
+                
+                <div th:if="${#lists.isEmpty(articles)}" class="bg-white p-6 text-center border border-gray-200">
+                    <p class="text-gray-500">Публикаций пока нет.</p>
+                </div>
+                
+                <article th:each="article : ${articles}" class="bg-white border border-gray-200 hover:border-gray-300 transition flex flex-col md:flex-row">
+                    <!-- Banner image if exists -->
+                    <div th:if="${article.bannerUrl != null && !article.bannerUrl.empty}" class="md:w-1/3 h-48 md:h-auto overflow-hidden flex-shrink-0 relative">
+                        <img th:src="${article.bannerUrl}" class="w-full h-full object-cover" alt="Article banner">
+                    </div>
+                    <div class="p-6 flex flex-col justify-between flex-grow">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2 text-xs font-semibold tracking-wider text-red-600 uppercase">
+                                <span th:text="${article.category}">NEWS</span>
+                                <span th:if="${article.movie != null}" class="text-gray-400 font-normal">| О фильме: <span th:text="${article.movie.title}">Фильм</span></span>
+                            </div>
+                            <h3 class="text-xl md:text-2xl serif-title font-bold leading-tight mb-2 hover:text-[#005689] transition">
+                                <a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}">Заголовок статьи</a>
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3" th:text="${article.leadParagraph}">Краткий вводный абзац...</p>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-3">
+                            <span class="font-medium" th:text="${article.author.displayName}">Автор</span>
+                            <span th:text="${#temporals.format(article.createdAt, 'dd.MM.yyyy HH:mm')}">Дата</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Right Side: Sidebar - Trending/Top-rated Movies (1/3 width) -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-bold serif-title border-b-2 border-[#005689] pb-2 mb-6">Рейтинговые фильмы</h2>
+                
+                <div th:if="${#lists.isEmpty(trendingMovies)}" class="bg-white p-6 text-center border border-gray-200">
+                    <p class="text-gray-500">Фильмов пока нет.</p>
+                </div>
+                
+                <div th:each="movie : ${trendingMovies}" class="bg-white border border-gray-200 hover:border-gray-300 transition p-4 flex gap-4">
+                    <div class="w-16 h-24 bg-gray-100 flex-shrink-0 overflow-hidden">
+                        <img th:if="${movie.posterUrl != null && !movie.posterUrl.empty}" th:src="${movie.posterUrl}" class="w-full h-full object-cover" alt="Poster">
+                        <div th:unless="${movie.posterUrl != null && !movie.posterUrl.empty}" class="w-full h-full flex items-center justify-center text-gray-400 text-xs">Нет фото</div>
+                    </div>
+                    <div class="flex flex-col justify-between flex-grow">
+                        <div>
+                            <h3 class="font-bold text-sm text-gray-900 leading-tight hover:text-[#005689] transition">
+                                <a th:href="@{/movies/{id}(id=${movie.id})}" th:text="${movie.title}">Название фильма</a>
+                            </h3>
+                            <p class="text-xs text-gray-500 mt-1">
+                                <span th:text="${movie.releaseYear}">2024</span> год, <span th:text="${movie.durationMinutes} + ' мин'">120 мин</span>
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-1 mt-2">
+                            <span class="text-yellow-500 text-sm">★</span>
+                            <span class="font-semibold text-sm text-gray-800" th:text="${movie.averageRating}">8.5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

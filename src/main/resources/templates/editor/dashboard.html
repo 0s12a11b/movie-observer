@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Редактор — The Movie Observer</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Editor Panel Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 mb-2">
+                ✏️ Редактор
+            </span>
+            <h1 class="text-3xl font-bold text-gray-900" style="font-family:'Georgia',serif;">Панель редактора</h1>
+            <p class="text-gray-500 mt-1">Управление материалами, фильмами и рецензиями</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a sec:authorize="hasAnyRole('EDITOR', 'ADMIN')" href="/editor/movies/new"
+               class="inline-flex items-center gap-2 bg-[#005689] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#00436a] transition">
+                + Добавить фильм
+            </a>
+            <a sec:authorize="hasAnyRole('EDITOR', 'ADMIN')" href="/editor/persons/new"
+               class="inline-flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition">
+                + Добавить персону
+            </a>
+            <a sec:authorize="hasAnyRole('EDITOR', 'ADMIN')" href="/editor/reviews"
+               class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">
+                📋 Модерация рецензий
+            </a>
+            <a href="/editor/articles/new"
+               class="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition">
+                + Написать статью
+            </a>
+        </div>
+    </div>
+
+    <!-- Movies Table (Only for EDITOR or ADMIN) -->
+    <div sec:authorize="hasAnyRole('EDITOR', 'ADMIN')" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-800">Фильмы</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Название</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Год</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Рейтинг</th>
+                        <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(movies)}">
+                        <td colspan="4" class="px-6 py-12 text-center text-gray-400">Фильмов пока нет. Добавьте первый!</td>
+                    </tr>
+                    <tr th:each="movie : ${movies}"
+                        class="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900" th:text="${movie.title}"></td>
+                        <td class="px-6 py-4 text-gray-600" th:text="${movie.releaseYear}"></td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center gap-1 text-amber-600 font-semibold">
+                                ★ <span th:text="${#numbers.formatDecimal(movie.averageRating, 1, 1)}"></span>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a th:href="@{/editor/movies/{id}/edit(id=${movie.id})}"
+                                   class="px-3 py-1.5 text-xs font-semibold text-[#005689] border border-[#005689] rounded hover:bg-[#005689] hover:text-white transition">
+                                    Изменить
+                                </a>
+                                <form th:action="@{/editor/movies/{id}/delete(id=${movie.id})}" method="post"
+                                      onsubmit="return confirm('Удалить фильм «' + this.dataset.title + '»?')"
+                                      th:data-title="${movie.title}">
+                                    <button type="submit"
+                                            class="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-300 rounded hover:bg-red-600 hover:text-white transition">
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Articles Table (For CRITIC, EDITOR, ADMIN) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-800">Ваши статьи</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Заголовок</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Категория</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Дата создания</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Статус</th>
+                        <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(articles)}">
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-400">У вас пока нет статей. Напишите первую!</td>
+                    </tr>
+                    <tr th:each="art : ${articles}"
+                        class="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900" th:text="${art.title}"></td>
+                        <td class="px-6 py-4 text-gray-650">
+                            <span th:text="${art.category}" class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded"></span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500" th:text="${#temporals.format(art.createdAt, 'dd.MM.yyyy HH:mm', new java.util.Locale('ru'))}"></td>
+                        <td class="px-6 py-4">
+                            <span th:if="${art.status == T(com.movieobserver.domain.entity.Article.ArticleStatus).PUBLISHED}"
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                Опубликовано
+                            </span>
+                            <span th:if="${art.status == T(com.movieobserver.domain.entity.Article.ArticleStatus).DRAFT}"
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                Черновик
+                            </span>
+                            <span th:if="${art.status == T(com.movieobserver.domain.entity.Article.ArticleStatus).ARCHIVED}"
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                В архиве
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a th:href="@{/editor/articles/{id}/edit(id=${art.id})}"
+                                   class="px-3 py-1.5 text-xs font-semibold text-[#005689] border border-[#005689] rounded hover:bg-[#005689] hover:text-white transition">
+                                    Изменить
+                                </a>
+                                <form th:action="@{/editor/articles/{id}/delete(id=${art.id})}" method="post"
+                                      onsubmit="return confirm('Удалить статью «' + this.dataset.title + '»?')"
+                                      th:data-title="${art.title}">
+                                    <button type="submit"
+                                            class="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-300 rounded hover:bg-red-600 hover:text-white transition">
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
