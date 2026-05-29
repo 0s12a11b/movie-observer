@@ -14,11 +14,6 @@ bin/
 .metadata/
 .vscode/
 
-# Local agents and CLI directories
-.antigravitycli/
-.agents/
-attachment.md
-
 # OS specific files
 Thumbs.db
 db.db

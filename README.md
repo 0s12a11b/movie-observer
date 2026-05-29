@@ -1,4 +1,4 @@
-# The Movie Observer (Наблюдатель Кино)
+# Веб-сервис "Каталог фильмов"
 
 [![Java Version](https://img.shields.io/badge/Java-25-orange.svg)](https://jdk.java.net/25/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0--M1-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -170,28 +170,64 @@ INSERT INTO user_roles (user_id, role_id) VALUES ('a1b2c3d4-...', 3);
 
 ---
 
-## Запуск тестов и отчеты
+## Тестирование и отчеты
 
-Проект покрыт модульными и интеграционными тестами (всего 7 ключевых сценариев E2E, включая проверку авторизации, регистрацию, добавление отзывов, проверку Actuator).
+Проект покрыт модульными (Unit) и интеграционными (E2E) тестами — всего **70 тестов** в **9 тестовых классах**.
+
+### Структура тестов
+
+Все файлы тестов находятся в директории `src/test/java/com/movieobserver/` и разделены по категориям:
+
+1. **Модульные тесты веб-слоя (Controller Unit Tests)** — 41 тест:
+   * **[AuthControllerTest.java] (10 тестов)** — Проверка страниц логина/регистрации, успешной аутентификации с выдачей JWT-cookies, логаута и обработки ошибок валидации.
+   * **[WebCatalogControllerTest.java] (10 тестов)** — Просмотр каталога, деталей фильма/статьи, фильтрации и отправки отзывов (авторизованными пользователями с валидацией оценок и текста).
+   * **[ArticleControllerTest.java] (10 тестов)** — Проверка создания/редактирования статей и ролевого доступа авторов (только автор может редактировать свою статью).
+   * **[EditorControllerTest.java] (11 тестов)** — Управление фильмами (CRUD), добавление актеров/режиссеров и модерация отзывов.
+
+2. **Модульные тесты сервисов и безопасности (Service & Security Unit Tests)** — 22 теста:
+   * **[MovieServiceTest.java] (6 тестов)** — Логика сохранения, удаления и поиска фильмов.
+   * **[ReviewServiceTest.java] (9 тестов)** — Модерация рецензий, автоматическое одобрение для критиков и перерасчет рейтинга фильма.
+   * **[JwtProviderTest.java] (7 тестов)** — Генерация, валидация JWT-токенов и управление куками.
+
+3. **Интеграционные тесты базы данных (Integration E2E Tests)** — 7 тестов:
+   * **[UserFlowIntegrationTest.java] (7 тестов)** — Сквозные сценарии (E2E) регистрации, авторизации, создания фильмов и отзывов с использованием реального контейнера PostgreSQL (на базе **Testcontainers**). Конфигурация БД описана в **[BaseIntegrationTest.java]**.
+
+---
 
 ### Выполнение тестов
+
+#### Способ 1. Стандартный запуск через Gradle (Linux/macOS)
 ```bash
 ./gradlew test
 ```
 
+#### Способ 2. Запуск на Windows
+Если у вас Windows и сборщик падает с ошибкой `ClassNotFoundException` из-за кириллицы в путях, запускайте тесты напрямую через JUnit ConsoleLauncher с использованием Mockito-агента для обхода ограничений на динамическую загрузку:
+
+**Шаг 1.** Подготовьте зависимости тестов:
+```cmd
+gradlew.bat testClasses copyTestDependencies copyJacocoAgent
+```
+
+**Шаг 2.** Запустите ConsoleLauncher:
+```cmd
+java.exe -javaagent:build/dependencies/mockito-core-5.18.0.jar "-Dfile.encoding=UTF-8" "-Dapi.version=1.43" -cp "build/dependencies/*;build/classes/java/main;build/classes/java/test;build/resources/main;build/resources/test" org.junit.platform.console.ConsoleLauncher execute --scan-classpath --reports-dir=build/test-results/manual
+```
+
 > [!IMPORTANT]
-> Интеграционные тесты используют **Testcontainers** для поднятия реальной базы данных PostgreSQL в Docker. Убедитесь, что Docker запущен перед стартом тестов.
->
-> Если вы используете **Docker Desktop на Windows** по протоколу TCP, для обхода ограничений версии API может потребоваться передать параметр:
-> ```bash
-> ./gradlew test -Dapi.version=1.43
-> ```
+> Для работы интеграционных тестов (`UserFlowIntegrationTest`) требуется запущенный Docker. 
+> Если вы используете **Docker Desktop на Windows**, включите опцию `"Expose daemon on tcp://localhost:2375 without TLS"` в настройках Docker Desktop (Settings -> General).
+
+---
 
 ### Отчет о покрытии (JaCoCo)
+
+Генерация HTML-отчета о покрытии тестами:
 ```bash
 ./gradlew jacocoTestReport
 ```
-Отчет будет доступен в папке: `build/reports/jacoco/test/html/index.html`
+После этого интерактивный отчет будет доступен по пути:
+`build/reports/jacoco/test/html/index.html`
 
 ---
 
